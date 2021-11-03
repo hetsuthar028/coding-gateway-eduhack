@@ -144,11 +144,14 @@ app.get(`${paths["getQuestion"]}`, async (req, res) => {
 });
 
 app.get(`${paths["getAllQuestions"]}`, async (req, res) => {
+    let category = req.query.category;
+
+    console.log("Req question category", req.query);
     let allQuestions;
     try{
-        allQuestions = await Question.find({}).exec();
+        allQuestions = await Question.find({category: category}).exec();
     } catch(err){
-        console.log("Error fetching all questions from DB");
+        console.log("Error fetching all questions from DB", err);
         return res.status(400).json({success: false, error: err});
     }
     return res.status(200).json({success: true, questions: allQuestions});

@@ -51,6 +51,10 @@ const QuestionSchema = mongoose.Schema({
     maxExecutionInSec: {
         type: Number,
         required: true
+    },
+    category: {
+        type: String,
+        required: true
     }
 });
 
