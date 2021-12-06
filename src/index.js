@@ -1,12 +1,15 @@
 const { default: axios } = require('axios');
-const { urlencoded } = require('express');
+const { urlencoded, response } = require('express');
 const express = require('express');
 const { executeFile } = require('./execFile');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const Question = require('../models/Question');
+const Job = require('../models/Job');
+const CodeSolution = require('../models/CodeSolution');
 const fs = require('fs');
 const path = require('path');
+const async = require('async');
 require('dotenv');
 
 const PORT = process.env.SERVER_PORT || 9200;
@@ -33,8 +36,9 @@ const paths = {
     addQuestion: '/api/coding/add/question',
     getQuestion: '/api/coding/get/question',
     getAllQuestions: '/api/coding/get/all/questions',
-    getDefaultFile: '/api/coding/get/defaultfile/:language'
+    getDefaultFile: '/api/coding/get/defaultfile/:language',
     // getPythonStatus: 'http://localhost:10300/api/code/server/status/:jobId',
+    getUsersSolvedQuestions: '/api/coding/get/solvedQuestions'
 }
 
 const serverMapping = {
@@ -52,6 +56,7 @@ app.get(`${paths['getStatus']}`, async (req, res) => {
     
     const jobId = req.params.jobId;
     const language = req.params.language.toLowerCase();
+    console.log("Status for Lang", language);
 
     if(language == "javascript"){
         
@@ -85,9 +90,9 @@ app.get(`${paths['getStatus']}`, async (req, res) => {
 
 app.post(`${paths['runCode']}`, async (req, res) => {
     
-    console.log("Request to Main Gateway")
     
     let { language, content, userEmail, questionId } = req.body;
+    console.log("Request to Main Gateway", language)
     
     try{
 
@@ -182,6 +187,88 @@ app.get(`${paths["getDefaultFile"]}`, async (req, res) => {
         return res.status(500).json({success: false, error: err});
     }
 });
+
+app.get(`${paths["getUsersSolvedQuestions"]}`, (req, res) => {
+    let userHeaders = req.headers.authorization;
+    if(!userHeaders){
+        return res.status(500).send({success: false, error: 'Invalid user'});
+    }
+
+    async.auto({
+        get_current_user: function(callback){
+            axios.get(`http://localhost:4200/api/user/currentuser`, {
+                headers: {
+                    authorization: userHeaders
+                }
+            }).then((userResp) => {
+                if(!userResp.data.currentUser){
+                    callback('Invalid user', null);
+                }
+                callback(null, userResp.data.currentUser);
+            }).catch((err) => {
+                callback('Invalid user2', null);
+            })
+        },
+        get_solved_questions: [
+            "get_current_user", 
+            function(result, callback){
+                let currentUser = result.get_current_user;
+                console.log("Current User", currentUser.email)
+
+                let responseArr = [];
+
+                CodeSolution.find({userEmail: currentUser.email}).then((codeSl) => {
+                    let tempObj = {}    
+                    
+                    // tempObj.codeSolutionID = codeSl["_id"];
+                    
+
+                    codeSl.forEach((sl) => {
+                        tempObj["codeSolutionID"] = sl["_id"];
+                        tempObj["questionID"] = sl.questionID;
+                        tempObj["jobID"] = sl.jobID;
+                        tempObj["timestamp"] = sl.timestamp;
+                        tempObj["output"] = sl.output;
+                        Job.findById(sl.jobID, {status: 1}).then((newResp) => {
+                            // console.log("New Resp", Object.keys(newResp))
+                            
+                            tempObj["status"] = newResp.status;
+
+                            // console.log("Resp Obj", tempObj);
+                            // ...newResp
+                            Question.findById(sl.questionID, {title: 1}).then((questionResp) => {
+                                console.log("Question Resp", questionResp);
+                                tempObj["questionTitle"] = questionResp.title;
+
+                                responseArr.push(tempObj);
+
+                                if(codeSl.length == responseArr.length){
+                                    callback(null, {success: true, codeSolutions : responseArr})
+                                }
+                            }).catch((err) => {
+                                console.log("ERR1")
+                            })
+                        }).catch((err) => {
+                            console.log("ERR2", err)
+                        })
+
+
+                    })
+                    
+                    // return res.status(200).send({success: true, codeSl});
+                }).catch((err) => {
+                    console.log("ERROR GETTING DATA", err);
+                })
+            }   
+        ]
+    }).then((responses) => {
+        console.log("Responses Code Solutions - ", responses);
+        return res.status(200).send({success: true, responses});
+    }).catch((err) => {
+        console.log("Error while processing request", err);
+        return res.status(500).send({success: false, err: JSON.stringify(err)});
+    })
+})
 
 app.listen(PORT, () => {
     console.log(`Coding Gateway listening on ${PORT}`);
