@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:9000"
+      - "1380:9000"
     environment:
       - SERVER_PORT=9000
 
