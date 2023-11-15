@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        lable 'new_server'
+    }
 
     stages {
         stage('Build') {
