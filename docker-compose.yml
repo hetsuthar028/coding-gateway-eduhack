@@ -2,7 +2,7 @@ version: '3.8'
 services:
   node-app:
     build:
-      context: /home/ubuntu/coding-gateway-eduhack
+      context: .
       dockerfile: Dockerfile
     environment:
       SERVER_PORT: '9000'
