@@ -5,7 +5,6 @@ pipeline {
 
     environment {
         DOCKER_HUB_CREDENTIALS = credentials('bismabaig') // Use your DockerHub credentials ID
-        echo "DOCKER_HUB_CREDENTIALS: $DOCKER_HUB_CREDENTIALS"
         DOCKER_IMAGE_NAME = 'bismabaig/node-app' // Replace with your DockerHub username and desired image name
         DOCKER_COMPOSE_FILE = 'docker-compose.yml'
         DOCKER_PASSWORD = 'dckr_pat__sA_DskaI2GcAGMPxNHz2uIaJoA'
@@ -18,6 +17,7 @@ pipeline {
                 script {
                     // Simple Docker build command
                     sh 'docker build -t $DOCKER_IMAGE_NAME .'
+                    echo "DOCKER_HUB_CREDENTIALS: $DOCKER_HUB_CREDENTIALS"
 
                     // Log in to DockerHub
                     withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS, passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
