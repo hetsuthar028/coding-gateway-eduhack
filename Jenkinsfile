@@ -2,55 +2,41 @@ pipeline {
     agent {
         label 'new_server'
     }
-
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('bismabaig') // Use your DockerHub credentials ID
-        DOCKER_IMAGE_NAME = 'bismabaig/node-app' // Replace with your DockerHub username and desired image name
-        DOCKER_COMPOSE_FILE = 'docker-compose.yml'
-        DOCKER_PASSWORD = 'dckr_pat__sA_DskaI2GcAGMPxNHz2uIaJoA'
-        DOCKER_USERNAME = 'bismabaig'
+       
+        DOCKER_CREDS = credentials('bismabaig')
     }
-
-    tools {
-        // Specify the name of the Git tool configured in Jenkins
-        git 'Default'
-    }
-
     stages {
-        stage('Build') {
+        stage('Git') {
+            steps {
+                git credentialsId: 'githubnew', url: 'https://github.com/BismaNaeemBaig31/nodejs-example-with-mongo-atlas.git'
+            }
+        }
+        stage('Main Branch') {
+            when {
+                expression {
+                    return env.BRANCH_NAME == 'main'
+                }
+            }
             steps {
                 script {
-                    // Simple Docker build command
-                    sh "docker build -t $DOCKER_IMAGE_NAME ."
-                    echo "DOCKER_HUB_CREDENTIALS: $DOCKER_HUB_CREDENTIALS"
-
-                    // Log in to DockerHub
-                    withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS, passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                        sh "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
-                    }
-
-                    // Push the Docker image to DockerHub
-                    sh "docker push $DOCKER_IMAGE_NAME"
+                    docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW
+                    docker build . "-t bismabaig/node-app:$BUILD_ID -t bismabaig/nodejs:prod-$BUILD_ID"
+                    docker push "bismabaig/node-app:$BUILD_ID"
                 }
             }
         }
-
-        stage('Run') {
+        stage('Dev Branch') {
+            when {
+                expression {
+                    return env.BRANCH_NAME == 'dev'
+                }
+            }
             steps {
                 script {
-                    // Use the image from the Docker Compose file and run the container
-                    sh "docker-compose -f $DOCKER_COMPOSE_FILE up -d"
+                    docker build . "-t bismabaig/nodejs:$BUILD_ID -t bismabaig/nodejs:dev-$BUILD_ID"
+                    docker push "bismabaig/nodejs:$BUILD_ID"
                 }
             }
         }
-    }
-
-    post {
-        success {
-            // Clean up: Log out from DockerHub
-            script {
-                sh 'docker logout'
-            }
-        }
-    }
-}
+    } // end of stages
