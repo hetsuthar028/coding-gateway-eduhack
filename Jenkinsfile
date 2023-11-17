@@ -3,9 +3,8 @@ pipeline {
         label 'new_server'
     }
     environment {
-       
         DOCKER_CREDS = credentials('bismabaig')
-        DOCKER_CREDS_PSW = 
+        DOCKER_CREDS_PSW = ''
     }
     stages {
         stage('Git') {
@@ -14,7 +13,6 @@ pipeline {
             }
         }
         stage('Build') {
-            
             steps {
                 script {
                     docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW
@@ -23,14 +21,5 @@ pipeline {
                 }
             }
         }
-        stage('master Branch') {
-            
-            steps {
-                script {
-                    docker build . "-t bismabaig/node-app:$BUILD_ID -t bismabaig/node-app:dev-$BUILD_ID"
-                    docker push "bismabaig/node-app:$BUILD_ID"
-                }
-            }
-        }
-    } // end of stages
+    } 
 }
