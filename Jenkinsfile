@@ -16,7 +16,7 @@ pipeline {
             steps {
                 script {
                     // Simple Docker build command
-                    sh 'docker build -t $DOCKER_IMAGE_NAME .'
+                    sh "docker build -t $DOCKER_IMAGE_NAME ."
                     echo "DOCKER_HUB_CREDENTIALS: $DOCKER_HUB_CREDENTIALS"
 
                     // Log in to DockerHub
