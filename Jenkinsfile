@@ -11,6 +11,11 @@ pipeline {
         DOCKER_USERNAME = 'bismabaig'
     }
 
+    tools {
+        // Specify the name of the Git tool configured in Jenkins
+        git 'Default'
+    }
+
     stages {
         stage('Build') {
             steps {
