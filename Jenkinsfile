@@ -7,11 +7,6 @@ pipeline {
         DOCKER_CREDS_PSW = ''
     }
     stages {
-        stage('Git') {
-            steps {
-                git credentialsId: 'githubnew', url: 'https://github.com/BismaNaeemBaig31/coding-gateway-eduhack.git'
-            }
-        }
         stage('Build') {
             steps {
                 script {
