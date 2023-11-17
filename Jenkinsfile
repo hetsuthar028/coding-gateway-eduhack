@@ -14,10 +14,14 @@ pipeline {
                     docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW
                     docker build . -t bismabaig/node-app:latest
                     docker push bismabaig/node-app:latest
-                    docker compose up -d
                     '''
                 }
             }
         }
-    } 
+    }
+    post { 
+        success {
+                docker compose up -d
+    }
+ }
 }
