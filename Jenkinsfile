@@ -5,6 +5,7 @@ pipeline {
     environment {
        
         DOCKER_CREDS = credentials('bismabaig')
+        DOCKER_CREDS_PSW = 
     }
     stages {
         stage('Git') {
@@ -12,12 +13,8 @@ pipeline {
                 git credentialsId: 'githubnew', url: 'https://github.com/BismaNaeemBaig31/coding-gateway-eduhack.git'
             }
         }
-        stage('Main Branch') {
-            when {
-                expression {
-                    return env.BRANCH_NAME == 'main'
-                }
-            }
+        stage('Build') {
+            
             steps {
                 script {
                     docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW
@@ -26,12 +23,8 @@ pipeline {
                 }
             }
         }
-        stage('Dev Branch') {
-            when {
-                expression {
-                    return env.BRANCH_NAME == 'dev'
-                }
-            }
+        stage('master Branch') {
+            
             steps {
                 script {
                     docker build . "-t bismabaig/node-app:$BUILD_ID -t bismabaig/node-app:dev-$BUILD_ID"
