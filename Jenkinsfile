@@ -4,7 +4,7 @@ pipeline {
     }
     environment {
         DOCKER_CREDS = credentials('dockerhub_id')
-        TAG = 'branch'
+         
         
     }
     stages {
@@ -13,8 +13,8 @@ pipeline {
                 script {
                     sh '''
                     docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW
-                    docker build . -t bismabaig/node-app:latest $TAG
-                    docker push bismabaig/node-app:latest $TAG
+                    docker build . -t bismabaig/node-app:latest $BRANCH_NAME
+                    docker push bismabaig/node-app:latest $BRANCH_NAME
                     '''
                 }
             }
