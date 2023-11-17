@@ -23,5 +23,8 @@ pipeline {
         success {
                sh  'docker compose up -d'
     }
+        failure { 
+        sh "echo 'stage is fail'"
+        }
  }
 }
