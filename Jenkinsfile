@@ -13,8 +13,9 @@ pipeline {
                 script {
                     sh '''
                     docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW
-                    docker build . -t bismabaig/node-app:$BRANCH_NAME-latest
+                    docker build . -t bismabaig/node-app:$BRANCH_NAME-latest -t bismabaig/node-app:$BRANCH_NAME-$BUILD-ID
                     docker push bismabaig/node-app:$BRANCH_NAME-latest
+                    docker push bismabaig/node-app:$BRANCH_NAME-$BUILD-ID
                     '''
                 }
             }
