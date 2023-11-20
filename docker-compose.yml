@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  node-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: node-app:latest
+    environment:
+      SERVER_PORT: '9000'
+    ports:
+      - "1480:9000"
