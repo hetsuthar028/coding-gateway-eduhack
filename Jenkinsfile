@@ -13,12 +13,22 @@ pipeline {
                 script {
                     sh '''
                     docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW
-                    docker build . -t bismabaig/node-app:latest $BRANCH_NAME
-                    docker push bismabaig/node-app:latest $BRANCH_NAME
+                    docker build . -t bismabaig/node-app:$BRANCH_NAME-latest
+                    docker push bismabaig/node-app:$BRANCH_NAME-latest
                     '''
                 }
             }
         }
+        stage('Dev Branch') {
+    steps {
+        script {
+            docker.build(".")
+                  .t("bismabaig/node-app:${BUILD_ID}")
+                  .t("bismabaig/node-app:dev-${BUILD_ID}")
+                  .execute()
+        }
+    }
+}
     }
     post { 
         success {
