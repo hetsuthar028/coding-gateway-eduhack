@@ -19,16 +19,6 @@ pipeline {
                 }
             }
         }
-        stage('Dev Branch') {
-    steps {
-        script {
-            docker.build(".")
-                  .t("bismabaig/node-app:${BUILD_ID}")
-                  .t("bismabaig/node-app:dev-${BUILD_ID}")
-                  .execute()
-        }
-    }
-}
     }
     post { 
         success {
