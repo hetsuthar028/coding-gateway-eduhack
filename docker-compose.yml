@@ -4,8 +4,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: node-app:latest
+    image: bismabaig/node-app:$BRANCH_NAME-latest
     environment:
       SERVER_PORT: '9000'
     ports:
-      - "1480:9000"
+      - "${EXT_PORT}:9000"
