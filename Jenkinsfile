@@ -23,6 +23,7 @@ pipeline {
     post { 
         success {
             script{
+                def EXT_PORT
             if (BRANCH_NAME == 'development') {
                      sh 'export EXT_PORT=1480'
                     } else {
