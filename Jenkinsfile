@@ -9,10 +9,10 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    if ($BRANCH_NAME == 'development') {
-                      export EXT_PORT=1480
+                    if (BRANCH_NAME == 'development') {
+                     sh 'export EXT_PORT=1480'
                     } else {
-                       export EXT_PORT=1580
+                     sh 'export EXT_PORT=1580'
                     }
                     sh '''
                         docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW
