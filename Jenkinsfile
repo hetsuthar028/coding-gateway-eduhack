@@ -23,11 +23,10 @@ pipeline {
     post { 
         success {
             script{
-                def EXT_PORT
             if (BRANCH_NAME == 'development') {
-                     sh 'export EXT_PORT=1480'
+                     sh 'echo EXT_PORT=1480 > .env'
                     } else {
-                     sh 'export EXT_PORT=1580'
+                     sh 'echo EXT_PORT=1580 > .env'
                     }
                 sh 'docker-compose up -d'
             }
